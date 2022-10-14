@@ -33,3 +33,5 @@ for each_type in type_dict.keys():  # 遍历类型字典
     print("%5s 下共有 [%5s] 的文件 [%5d] 个 , 占用内存[%7.2f]MB"%
           (path, each_type, type_dict[each_type], size_dict[each_type] / (1024 * 1024)))
 
+print("总文件数：[%d]" % (sum(type_dict.values())))
+print("总内存大小： [%.2f]GB" % (sum(size_dict.values()) / 1024 ** 3))  # **的作用是幂运算，开3次方是因为是GB
