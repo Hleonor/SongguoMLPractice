@@ -15,7 +15,7 @@ def get_size_type(path):
             get_size_type(temp_path)
         elif os.path.isfile(temp_path):  # 如果不是文件夹则判断是不是一个文件
             type_name = os.path.splitext(temp_path)[1]  # 该函数会返回文件名称和后缀，此处获得第二个参数
-            if not type_name: # 如果没有后缀名
+            if not type_name:  # 如果没有后缀名
                 type_dict.setdefault("None", 0)  # 改键不存在于字典当中，则为其添加一个默认键
                 type_dict["None"] += 1  # 键为None的值个数加1
                 size_dict.setdefault("None", 0)
@@ -30,7 +30,7 @@ def get_size_type(path):
 path = "F:/scope"
 get_size_type(path)
 for each_type in type_dict.keys():  # 遍历类型字典
-    print("%5s 下共有 [%5s] 的文件 [%5d] 个 , 占用内存[%7.2f]MB"%
+    print("%5s 下共有 [%5s] 的文件 [%5d] 个 , 占用内存[%7.2f]MB" %
           (path, each_type, type_dict[each_type], size_dict[each_type] / (1024 * 1024)))
 
 print("总文件数：[%d]" % (sum(type_dict.values())))
