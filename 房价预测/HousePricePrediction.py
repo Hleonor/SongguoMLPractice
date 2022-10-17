@@ -34,3 +34,11 @@ for i in range(10):
         最后给出的是房价
     '''
     print(feature, target)  # 打印输出，可以看到数据是13维的，每一维都表示了不同的特征
+
+# 切分数据集
+train_dataset = paddle.text.datasets.UCIHousing(mode='train')  # 训练集
+eval_dataset = paddle.text.datasets.UCIHousing(mode='test')  # 测试集
+train_loader = paddle.io.DataLoader(train_dataset, batch_size=32, shuffle=True)  # 训练集加载器，每次加载32个数据
+eval_loader = paddle.io.DataLoader(eval_dataset, batch_size=8, shuffle=False)  # 测试集加载器，每次加载8个数据，测试不打乱顺序
+
+# 网络搭建
