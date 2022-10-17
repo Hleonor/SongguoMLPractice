@@ -89,29 +89,24 @@ def draw_train_loss(Batchs, train_loss):
 # 模型训练
 model = MyDNN()  # 模型实例化
 model.train()  # 训练模式
-mse_loss = paddle.nn.MSELoss()
-opt = paddle.optimizer.SGD(learning_rate=0.0005, parameters=model.parameters())
-
+mse_loss = paddle.nn.MSELoss()  # 均方误差损失函数
+opt = paddle.optimizer.SGD(learning_rate=0.0005, parameters=model.parameters())  # 优化器，使用随机梯度下降，学习率为0.01，优化模型参数
 epochs_num = 200  # 迭代次数
-for pass_num in range(epochs_num):
-    for batch_id, data in enumerate(train_loader()):
-        image = data[0]
-        label = data[1]
-        predict = model(image)  # 数据传入model
-        # print(predict)
-        # print(np.argmax(predict,axis=1))
-        loss = mse_loss(predict, label)
-        # acc=paddle.metric.accuracy(predict,label.reshape([-1,1]))#计算精度
-        # acc = np.mean(label==np.argmax(predict,axis=1))
+
+for pass_num in range(epochs_num):  # 训练轮数
+    for batch_id, data in enumerate(train_loader()):  # 遍历训练集
+        feature = data[0]  # 获取特征
+        label = data[1]  # 获取标签，即房价
+        predict = model(feature)  # 数据传入model，前向传播，得到预测值
+        loss = mse_loss(predict, label)  # 计算损失
 
         if batch_id != 0 and batch_id % 10 == 0:
             Batch = Batch + 20
             Batchs.append(Batch)
             all_train_loss.append(loss.numpy()[0])
-            # all_train_accs.append(acc.numpy()[0])
-            print("epoch:{},step:{},train_loss:{}".format(pass_num, batch_id, loss.numpy()[0]))
-        loss.backward()
-        opt.step()
+            print("epoch: {}, step: {}, train_loss: {}".format(pass_num, batch_id, loss.numpy()[0]))  # 将tensor转换为numpy，再转换为python的标量
+        loss.backward()  # 反向传播，计算梯度
+        opt.step()  # 优化器更新参数
         opt.clear_grad()  # opt.clear_grad()来重置梯度
 paddle.save(model.state_dict(), 'MyDNN')  # 保存模型
-draw_train_loss(Batchs, all_train_loss)
+draw_train_loss(Batchs, all_train_loss)  # 绘制训练集的损失曲线
