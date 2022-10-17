@@ -134,14 +134,15 @@ print("avg_loss: {}".format(avg_loss))
 
 #绘制真实值和预测值对比图
 def draw_infer_result(groud_truths,infer_results):
-    title='Boston'
+    title = 'Boston'
     plt.title(title, fontsize=24)
     x = np.arange(1, 20)
     y = x
-    plt.plot(x, y)
+    plt.plot(x, y)  # 画对角线
     plt.xlabel('ground truth', fontsize=14)
     plt.ylabel('infer result', fontsize=14)
     plt.scatter(groud_truths, infer_results, color='green', label='training cost')
+    plt.legend()  # 显示图例
     plt.grid()
     plt.show()
 
