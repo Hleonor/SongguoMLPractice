@@ -103,10 +103,25 @@ for pass_num in range(epochs_num):  # 训练轮数
         if batch_id != 0 and batch_id % 10 == 0:
             Batch = Batch + 20
             Batchs.append(Batch)
-            all_train_loss.append(loss.numpy()[0])
+            all_train_loss.append(loss.numpy()[0])  # 之前打印不出来是因为这里名字搞错了
             print("epoch: {}, step: {}, train_loss: {}".format(pass_num, batch_id, loss.numpy()[0]))  # 将tensor转换为numpy，再转换为python的标量
         loss.backward()  # 反向传播，计算梯度
         opt.step()  # 优化器更新参数
         opt.clear_grad()  # opt.clear_grad()来重置梯度
 paddle.save(model.state_dict(), 'MyDNN')  # 保存模型
 draw_train_loss(Batchs, all_train_loss)  # 绘制训练集的损失曲线
+
+# 模型评估
+para_state_dict = paddle.load('MyDNN')  # 加载模型参数
+model = MyDNN()  # 模型实例化
+model.set_state_dict(para_state_dict)  # 加载模型参数
+model.eval()  # 评估模式
+losses= []  # 保存损失值
+for batch_id, data in enumerate(eval_loader()):
+    feature = data[0]
+    label = data[1]
+    predict = model(feature)  # 数据传入model，前向传播，得到预测值
+    loss = mse_loss(predict, label)  # 计算损失
+    losses.append(loss.numpy()[0])  # 将tensor转换为numpy，再转换为python的标量
+avg_loss = np.mean(losses)  # 计算平均损失
+print("avg_loss: {}".format(avg_loss))
