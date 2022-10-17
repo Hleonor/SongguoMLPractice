@@ -50,6 +50,18 @@ class MyDNN(paddle.nn.Layer):  # 继承paddle.nn.Layer类
         x = self.linear(inputs)
         return x
 
+# 模型训练
+model = MyDNN()  # 实例化模型
+model.train() # 训练模式
+mse_loss = paddle.nn.MSELoss()  # 均方误差损失函数
+opt=paddle.optimizer.SGD(learning_rate=0.00005, parameters=model.parameters())  # 优化器，使用随机梯度下降，学习率为0.01，优化模型参数
+epochs_nums = 200  # 训练轮数
+
+for epochs in range(epochs_nums):  # 训练轮数
+    for batch_id, data in enumerate(train_loader):  # 遍历训练集
+        feature = data[0]  # 获取特征
+        label = data[1]  # 获取标签
+        print(feature, label)  # 打印输出，可以看到数据是13维的，每一维都表示了不同的特征
 
 
 
