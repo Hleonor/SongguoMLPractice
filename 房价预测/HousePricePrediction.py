@@ -42,3 +42,28 @@ train_loader = paddle.io.DataLoader(train_dataset, batch_size=32, shuffle=True) 
 eval_loader = paddle.io.DataLoader(eval_dataset, batch_size=8, shuffle=False)  # 测试集加载器，每次加载8个数据，测试不打乱顺序
 
 # 网络搭建
+class MyDNN(paddle.nn.Layer):  # 继承paddle.nn.Layer类
+    def __int__(self):
+        super(MyDNN, self).__init__()  # 调用父类的构造函数
+        self.linear = paddle.nn.layer(13, 1, None)  # 线性层，输入13维，输出1维，None表示不使用激活函数
+    def forward(self, *inputs):  # 定义前向传播
+        x = self.linear(inputs)
+        return x
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
