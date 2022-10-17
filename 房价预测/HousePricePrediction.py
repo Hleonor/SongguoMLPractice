@@ -33,7 +33,7 @@ for i in range(10):
         13：MEDV：自住房的平均房价，以千美元计
         最后给出的是房价
     '''
-    print(feature, target)  # 打印输出，可以看到数据是13维的，每一维都表示了不同的特征
+    # print(feature, target)  # 打印输出，可以看到数据是13维的，每一维都表示了不同的特征
 
 # 切分数据集
 train_dataset = paddle.text.datasets.UCIHousing(mode='train')  # 训练集
@@ -41,41 +41,77 @@ eval_dataset = paddle.text.datasets.UCIHousing(mode='test')  # 测试集
 train_loader = paddle.io.DataLoader(train_dataset, batch_size=32, shuffle=True)  # 训练集加载器，每次加载32个数据
 eval_loader = paddle.io.DataLoader(eval_dataset, batch_size=8, shuffle=False)  # 测试集加载器，每次加载8个数据，测试不打乱顺序
 
+
 # 网络搭建
+# 定义全连接网络
 class MyDNN(paddle.nn.Layer):  # 继承paddle.nn.Layer类
-    def __int__(self):
+    def __init__(self):
         super(MyDNN, self).__init__()  # 调用父类的构造函数
-        self.linear = paddle.nn.layer(13, 1, None)  # 线性层，输入13维，输出1维，None表示不使用激活函数
-    def forward(self, *inputs):  # 定义前向传播
+        # 定义一层全连接层，输入维度是13，输出维度是1，激活函数为None，即不使用激活函数
+        self.linear = paddle.nn.Linear(13, 1, None)
+
+    # 网络的前向计算函数
+    def forward(self, inputs):
         x = self.linear(inputs)
         return x
 
+
+Batch = 0
+Batchs = []
+all_train_accs = []
+
+
+def draw_train_acc(Batchs, train_accs):
+    title = "training accs"
+    plt.title(title, fontsize=24)
+    plt.xlabel("batch", fontsize=14)
+    plt.ylabel("acc", fontsize=14)
+    plt.plot(Batchs, train_accs, color='green', label='training accs')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
+all_train_loss = []
+
+
+def draw_train_loss(Batchs, train_loss):
+    title = "training loss"
+    plt.title(title, fontsize=24)
+    plt.xlabel("batch", fontsize=14)
+    plt.ylabel("loss", fontsize=14)
+    plt.plot(Batchs, train_loss, color='red', label='training loss')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
 # 模型训练
-model = MyDNN()  # 实例化模型
-model.train() # 训练模式
-mse_loss = paddle.nn.MSELoss()  # 均方误差损失函数
-opt=paddle.optimizer.SGD(learning_rate=0.00005, parameters=model.parameters())  # 优化器，使用随机梯度下降，学习率为0.01，优化模型参数
-epochs_nums = 200  # 训练轮数
+model = MyDNN()  # 模型实例化
+model.train()  # 训练模式
+mse_loss = paddle.nn.MSELoss()
+opt = paddle.optimizer.SGD(learning_rate=0.0005, parameters=model.parameters())
 
-for epochs in range(epochs_nums):  # 训练轮数
-    for batch_id, data in enumerate(train_loader):  # 遍历训练集
-        feature = data[0]  # 获取特征
-        label = data[1]  # 获取标签
-        print(feature, label)  # 打印输出，可以看到数据是13维的，每一维都表示了不同的特征
+epochs_num = 200  # 迭代次数
+for pass_num in range(epochs_num):
+    for batch_id, data in enumerate(train_loader()):
+        image = data[0]
+        label = data[1]
+        predict = model(image)  # 数据传入model
+        # print(predict)
+        # print(np.argmax(predict,axis=1))
+        loss = mse_loss(predict, label)
+        # acc=paddle.metric.accuracy(predict,label.reshape([-1,1]))#计算精度
+        # acc = np.mean(label==np.argmax(predict,axis=1))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if batch_id != 0 and batch_id % 10 == 0:
+            Batch = Batch + 20
+            Batchs.append(Batch)
+            all_train_loss.append(loss.numpy()[0])
+            # all_train_accs.append(acc.numpy()[0])
+            print("epoch:{},step:{},train_loss:{}".format(pass_num, batch_id, loss.numpy()[0]))
+        loss.backward()
+        opt.step()
+        opt.clear_grad()  # opt.clear_grad()来重置梯度
+paddle.save(model.state_dict(), 'MyDNN')  # 保存模型
+draw_train_loss(Batchs, all_train_loss)
