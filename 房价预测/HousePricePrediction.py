@@ -117,11 +117,32 @@ model = MyDNN()  # 模型实例化
 model.set_state_dict(para_state_dict)  # 加载模型参数
 model.eval()  # 评估模式
 losses= []  # 保存损失值
+infer_results=[]  # 保存预测结果
+groud_truths=[]  # 保存真实结果
+
 for batch_id, data in enumerate(eval_loader()):
     feature = data[0]
     label = data[1]
+    groud_truths.extend(label.numpy())  # 将tensor转换为numpy，再转换为python的列表
     predict = model(feature)  # 数据传入model，前向传播，得到预测值
+    infer_results.extend(predict.numpy())  # 将tensor转换为numpy，再转换为python的列表
     loss = mse_loss(predict, label)  # 计算损失
     losses.append(loss.numpy()[0])  # 将tensor转换为numpy，再转换为python的标量
 avg_loss = np.mean(losses)  # 计算平均损失
 print("avg_loss: {}".format(avg_loss))
+
+
+#绘制真实值和预测值对比图
+def draw_infer_result(groud_truths,infer_results):
+    title='Boston'
+    plt.title(title, fontsize=24)
+    x = np.arange(1, 20)
+    y = x
+    plt.plot(x, y)
+    plt.xlabel('ground truth', fontsize=14)
+    plt.ylabel('infer result', fontsize=14)
+    plt.scatter(groud_truths, infer_results, color='green', label='training cost')
+    plt.grid()
+    plt.show()
+
+draw_infer_result(groud_truths, infer_results)
