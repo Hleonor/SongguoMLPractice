@@ -28,7 +28,7 @@ def formula_format(formula):
         第二个是目标字符串。此处是把所有空格 '' 替换成 ''，即完全去掉现有的空格
         第三是输入的目标字符串。
     '''
-    formula = re.sub('', '', formula)
+    formula = re.sub(' ', '', formula)
     # 以'横杠数字'分隔，其中正则表达式为:(\-\d+\.?\d*)
     # 以\-表示匹配横杠开头；\d+表示匹配数字一个或者多个；\.表示匹配小数点0个或1个；\d*表示匹配数字1个或多个
     formula_list = [i for i in re.split('(\-\d+\.?\d*)', formula) if i]  # 这里的if i表示去掉空字符串
